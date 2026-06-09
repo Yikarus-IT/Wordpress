@@ -1,0 +1,47 @@
+services:
+  wordpress:
+    image: wordpress:php8.3-apache
+    container_name: local-wordpress
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "${WORDPRESS_PORT:-8080}:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DEBUG: ${WORDPRESS_DEBUG:-1}
+    volumes:
+      - wordpress-data:/var/www/html
+      - ./src/wp-content/plugins/wp-dev-portfolio:/var/www/html/wp-content/plugins/wp-dev-portfolio
+
+  db:
+    image: mysql:8.0
+    container_name: local-wordpress-db
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./db-data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: local-wordpress-phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "${PHPMYADMIN_PORT:-8081}:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+volumes:
+  wordpress-data:
