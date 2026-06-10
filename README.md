@@ -8,10 +8,12 @@ It uses Docker Compose to run WordPress, MySQL, and phpMyAdmin locally, then mou
 
 - WordPress plugin structure
 - Admin menu creation with `add_menu_page`
+- Custom post type registration with `register_post_type`
 - Settings registration and sanitization
 - Public shortcode rendering with `[dev_profile]`
 - Frontend asset registration/enqueueing
 - Escaping output with `esc_html`, `esc_url`, and `esc_textarea`
+- Rewrite rule flushing on plugin activation/deactivation
 - Local WordPress development with Docker Compose
 
 ## Requirements
@@ -88,10 +90,25 @@ After WordPress starts:
 2. Finish the WordPress installer if needed.
 3. Go to **Plugins** and activate **WP Dev Portfolio**.
 4. Go to **Dev Profile** in the admin menu and edit the profile fields.
-5. Create a page that contains this shortcode:
+5. Go to **Portfolio Projects** and add a few sample projects.
+6. Create a page that contains this shortcode:
 
 ```text
 [dev_profile]
 ```
 
 That page will render the public developer profile card using the plugin data.
+
+## Study Sections
+
+### Section 1: Custom Post Type
+
+The plugin registers a `Portfolio Projects` content type with:
+
+- Admin menu support
+- Block editor support through `show_in_rest`
+- Title, editor, excerpt, and featured image fields
+- Public archive URLs at `/portfolio-projects`
+- Rewrite flushing on plugin activation/deactivation
+
+This is a common WordPress development task when a site needs structured content beyond normal posts and pages.

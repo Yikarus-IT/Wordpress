@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: WP Dev Portfolio
- * Description: Adds a small developer profile admin page and a frontend shortcode.
+ * Description: Adds a small developer profile admin page, portfolio projects, and frontend shortcodes.
  * Version: 1.0.0
  * Author: Local WordPress Lab
  * Text Domain: wp-dev-portfolio
@@ -12,11 +12,61 @@ if (! defined('ABSPATH')) {
 }
 
 const WDP_OPTION_NAME = 'wdp_profile';
+const WDP_PROJECT_POST_TYPE = 'wdp_project';
 
+register_activation_hook(__FILE__, 'wdp_activate_plugin');
+register_deactivation_hook(__FILE__, 'wdp_deactivate_plugin');
+
+add_action('init', 'wdp_register_project_post_type');
 add_action('admin_menu', 'wdp_register_admin_page');
 add_action('admin_init', 'wdp_register_settings');
 add_action('wp_enqueue_scripts', 'wdp_register_assets');
 add_shortcode('dev_profile', 'wdp_render_profile_shortcode');
+
+function wdp_activate_plugin(): void
+{
+    wdp_register_project_post_type();
+    flush_rewrite_rules();
+}
+
+function wdp_deactivate_plugin(): void
+{
+    flush_rewrite_rules();
+}
+
+function wdp_register_project_post_type(): void
+{
+    $labels = [
+        'name' => 'Portfolio Projects',
+        'singular_name' => 'Portfolio Project',
+        'menu_name' => 'Portfolio Projects',
+        'name_admin_bar' => 'Portfolio Project',
+        'add_new' => 'Add New',
+        'add_new_item' => 'Add New Project',
+        'new_item' => 'New Project',
+        'edit_item' => 'Edit Project',
+        'view_item' => 'View Project',
+        'all_items' => 'All Projects',
+        'search_items' => 'Search Projects',
+        'not_found' => 'No projects found.',
+        'not_found_in_trash' => 'No projects found in Trash.',
+    ];
+
+    register_post_type(
+        WDP_PROJECT_POST_TYPE,
+        [
+            'labels' => $labels,
+            'public' => true,
+            'show_in_rest' => true,
+            'menu_icon' => 'dashicons-portfolio',
+            'supports' => ['title', 'editor', 'excerpt', 'thumbnail'],
+            'has_archive' => true,
+            'rewrite' => [
+                'slug' => 'portfolio-projects',
+            ],
+        ]
+    );
+}
 
 function wdp_register_admin_page(): void
 {
